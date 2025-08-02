@@ -28,7 +28,7 @@ struct ContentView: View {
                     NavigationLink {
                         DuelView()
                     } label: {
-                        Image("Duel1")
+                        Image("Duel3")
                             .scaleEffect(0.5)
                             .frame(width: 50, height: 50)
                     } .offset(y: 75)
