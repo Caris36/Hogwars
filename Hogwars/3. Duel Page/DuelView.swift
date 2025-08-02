@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DuelView: View {
     var body: some View {
-        Text("Bye, World!")
+        Text("Work in Progress")
     }
 }
 
