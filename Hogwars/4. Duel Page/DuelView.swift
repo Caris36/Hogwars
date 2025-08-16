@@ -9,7 +9,12 @@ import SwiftUI
 
 struct DuelView: View {
     var body: some View {
-        Text("Work in Progress")
+        NavigationStack() {
+            VStack {
+                Text("Work in Progress")
+                    CameraView()
+            }
+        }
     }
 }
 

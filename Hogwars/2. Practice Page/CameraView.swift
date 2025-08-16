@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct CameraView: View {
+    @StateObject private var model = FrameHandler()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        FrameView(image: model.frame)
+            .ignoresSafeArea()
     }
 }
 
-#Preview {
-    CameraView()
+struct CameraView_Previews: PreviewProvider {
+    static var previews: some View {
+        CameraView()
+    }
 }
