@@ -12,7 +12,7 @@ struct DuelView: View {
         NavigationStack() {
             VStack {
                 Text("Work in Progress")
-                    CameraView()
+                CameraView()
             }
         }
     }

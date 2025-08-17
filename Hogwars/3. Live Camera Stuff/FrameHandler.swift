@@ -7,7 +7,6 @@ class FrameHandler: NSObject, ObservableObject {
     private var captureSession = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "sessionQueue")
     private let context = CIContext()
-    private var videoZoomFactor: CGFloat = -1000000000000000000
     
     override init() {
         super.init() 
@@ -16,10 +15,6 @@ class FrameHandler: NSObject, ObservableObject {
             self.setupCaptureSession()
             self.captureSession.startRunning()
         }
-    }
-    
-    func toggleZoom() {
-        videoZoomFactor *= -1
     }
     
     func checkPermission() {
@@ -42,11 +37,23 @@ class FrameHandler: NSObject, ObservableObject {
         }
     }
     
+    // only .builtInWideAngleCamera is for front camera
     func setupCaptureSession() {
         let videoOutput = AVCaptureVideoDataOutput()
         
         guard permissionGranted else { return }
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else { return }
+        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else {
+            return
+        }
+        
+        do {
+            try videoDevice.lockForConfiguration()
+            videoDevice.videoZoomFactor = 1.0
+            videoDevice.unlockForConfiguration()
+        } catch {
+            print("Failed to set zoom: \(error)")
+        }
+        
         guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else { return }
         guard captureSession.canAddInput(videoDeviceInput) else { return }
         captureSession.addInput(videoDeviceInput)
