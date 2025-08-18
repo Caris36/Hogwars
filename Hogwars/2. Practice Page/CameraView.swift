@@ -11,23 +11,24 @@ struct CameraView: View {
     @StateObject private var model = FrameHandler()
     
     var body: some View {
-        GeometryReader { geo in
+        ZStack(alignment: .topLeading) {
+            // insert back camera view
+            
             if let frame = model.frame {
                 Image(decorative: frame, scale: 0.5, orientation: .up)
                     .resizable()
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                    // .position(x: 0, y: 0)
-                    // .frame(width: geo.size.width, height: geo.size.height)
-                    // .scaleEffect(0.8)
+                    .scaledToFit()
+                    .frame(width: 170, height: 170, alignment: .topLeading)
                     .clipped()
                     .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
-            } else {
-                Color.black
+                    .padding(.top, 10)
+                    .padding(.leading, 10)
+                    .position(x: 85, y: 85)
             }
         }
-        .ignoresSafeArea()
     }
 }
+
 struct CameraView_Previews: PreviewProvider {
     static var previews: some View {
         CameraView()

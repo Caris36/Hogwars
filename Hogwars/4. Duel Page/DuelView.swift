@@ -11,7 +11,6 @@ struct DuelView: View {
     var body: some View {
         NavigationStack() {
             VStack {
-                Text("Work in Progress")
                // CameraView() should be moved to another folder of Practice Page, linked by OpenableBookView
                 CameraView()
             }

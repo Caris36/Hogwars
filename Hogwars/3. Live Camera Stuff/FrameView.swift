@@ -13,9 +13,11 @@ struct FrameView: View {
     
     var body: some View {
         if let image = image {
+            // scale is zoom
             Image(image, scale: 1.0, orientation: .up, label: label)
         } else {
             Color.black
+                .ignoresSafeArea()
         }
     }
 }
