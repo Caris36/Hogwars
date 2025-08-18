@@ -15,8 +15,8 @@ struct CameraView: View {
             if let frame = model.frame {
                 Image(decorative: frame, scale: 0.5, orientation: .up)
                     .resizable()
-                    .frame(width: 100, height: 50)
-                    .position(x: 0, y: 0)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                    // .position(x: 0, y: 0)
                     // .frame(width: geo.size.width, height: geo.size.height)
                     // .scaleEffect(0.8)
                     .clipped()
