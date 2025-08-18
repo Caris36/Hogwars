@@ -12,6 +12,7 @@ struct DuelView: View {
         NavigationStack() {
             VStack {
                 Text("Work in Progress")
+               // CameraView() should be moved to another folder of Practice Page, linked by OpenableBookView
                 CameraView()
             }
         }
