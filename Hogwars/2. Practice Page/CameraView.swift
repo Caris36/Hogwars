@@ -12,16 +12,34 @@ struct CameraView: View {
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            // insert back camera view
             
-            if let frame = model.frame {
-                Image(decorative: frame, scale: 0.5, orientation: .up)
+            // BACK CAMERA full screen
+            if let backFrame = model.backFrame {
+                Image(decorative: backFrame, scale: 1.0, orientation: .up)
                     .resizable()
-                    .scaledToFit()
-                    .frame(width: 170, height: 170, alignment: .topLeading)
-                    .clipped()
-                    .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
-                    .padding(.top, 10)
+                    .scaledToFill()
+                    .ignoresSafeArea()
+            } else {
+                Color.black.ignoresSafeArea()
+            }
+            
+            // FRONT CAMERA thumbnail (top-left)
+            if let frontFrame = model.frontFrame {
+                Image(decorative: frontFrame, scale: 0.5, orientation: .up)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 170, height: 140, alignment: .topLeading)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(radius: 4)
+                    .rotationEffect(.degrees(180))
+                    .scaleEffect(x: -1, y: 1)
+                    .padding(.top, 15)
+                    .padding(.bottom, 10)
+                    .position(x: 85, y: 85)
+            } else {
+                Color.black
+                    .frame(width: 170, height: 170)
+                    .padding(.top, 15)
                     .padding(.leading, 10)
                     .position(x: 85, y: 85)
             }

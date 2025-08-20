@@ -2,14 +2,17 @@ import AVFoundation
 import CoreImage
 
 class FrameHandler: NSObject, ObservableObject {
-    @Published var frame: CGImage?
+    @Published var frontFrame: CGImage?
+    @Published var backFrame: CGImage?
+    
     private var permissionGranted = false
-    private var captureSession = AVCaptureSession()
+    private var captureSession = AVCaptureMultiCamSession()
+    private var outputToCameraPosition: [AVCaptureOutput: AVCaptureDevice.Position] = [:]
     private let sessionQueue = DispatchQueue(label: "sessionQueue")
     private let context = CIContext()
     
     override init() {
-        super.init() 
+        super.init()
         checkPermission()
         sessionQueue.async { [unowned self] in
             self.setupCaptureSession()
@@ -19,68 +22,74 @@ class FrameHandler: NSObject, ObservableObject {
     
     func checkPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized: // The user had previously granted access to the camera
+        case .authorized:
             permissionGranted = true
-            
-        case .notDetermined: // The user has not yet been asked for camera access.
+        case .notDetermined:
             requestPermission()
-            
-        // Combine the two other cases into the default case
         default:
             permissionGranted = false
         }
     }
     
     func requestPermission() {
-        // Strong reference not a problem here but might become one in the future
-        AVCaptureDevice.requestAccess(for: .video) { [unowned self] granted in self.permissionGranted = granted
+        AVCaptureDevice.requestAccess(for: .video) { [unowned self] granted in
+            self.permissionGranted = granted
         }
     }
     
-    // only .builtInWideAngleCamera is for front camera
     func setupCaptureSession() {
-        let videoOutput = AVCaptureVideoDataOutput()
-        
         guard permissionGranted else { return }
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else {
-            return
+        
+        // FRONT camera
+        if let front = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
+           let frontInput = try? AVCaptureDeviceInput(device: front),
+           captureSession.canAddInput(frontInput) {
+            captureSession.addInput(frontInput)
+            
+            let frontOutput = AVCaptureVideoDataOutput()
+            frontOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "frontQueue"))
+            if captureSession.canAddOutput(frontOutput) {
+                captureSession.addOutput(frontOutput)
+                outputToCameraPosition[frontOutput] = .front
+            }
         }
         
-        do {
-            try videoDevice.lockForConfiguration()
-            videoDevice.videoZoomFactor = 1.0
-            videoDevice.unlockForConfiguration()
-        } catch {
-            print("Failed to set zoom: \(error)")
+        // BACK camera
+        if let back = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+           let backInput = try? AVCaptureDeviceInput(device: back),
+           captureSession.canAddInput(backInput) {
+            captureSession.addInput(backInput)
+            
+            let backOutput = AVCaptureVideoDataOutput()
+            backOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "backQueue"))
+            if captureSession.canAddOutput(backOutput) {
+                captureSession.addOutput(backOutput)
+                outputToCameraPosition[backOutput] = .back
+            }
         }
-        
-        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else { return }
-        guard captureSession.canAddInput(videoDeviceInput) else { return }
-        captureSession.addInput(videoDeviceInput)
-        
-        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sampleBufferQueue"))
-        captureSession.addOutput(videoOutput)
-        videoOutput.connection(with: .video)?.videoRotationAngle = 180
     }
 }
 
 extension FrameHandler: AVCaptureVideoDataOutputSampleBufferDelegate {
-    
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        guard let cgImage = imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
+    func captureOutput(_ output: AVCaptureOutput,
+                       didOutput sampleBuffer: CMSampleBuffer,
+                       from connection: AVCaptureConnection) {
         
-        // A11 UI updates should be/ must be performed on the main queue.
-        DispatchQueue.main.async { [unowned self] in
-            self.frame = cgImage
+        guard let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        let ciImage = CIImage(cvPixelBuffer: buffer)
+        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return }
+        
+        DispatchQueue.main.async {
+            if let position = self.outputToCameraPosition[output] {
+                switch position {
+                case .front:
+                    self.frontFrame = cgImage
+                case .back:
+                    self.backFrame = cgImage
+                default:
+                    break
+                }
+            }
         }
     }
-    
-    private func imageFromSampleBuffer(sampleBuffer: CMSampleBuffer) -> CGImage? {
-        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
-        let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-        
-        return cgImage
-    }
-    
 }
