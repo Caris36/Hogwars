@@ -49,15 +49,14 @@ struct PracticeView: View {
     @ViewBuilder
     func LeftView() -> some View {
         VStack {
-            Button {
-                withAnimation(.snappy(duration: 1)) {
-                    progress = (progress == 1.0 ? 0.2 : 1.0)
-                }
+            NavigationLink {
+                CameraView()
             } label: {
                 Image(.page1)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             }
+            
         }
     }
     //Right view
