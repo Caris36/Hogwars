@@ -51,6 +51,7 @@ struct OpenableBookView<Front: View, InsideLeft: View, InsideRight: View>:View, 
                         if -rotation > 90 {
                             insideLeft(size)
                                 .frame(width: size.width, height: size.height)
+                            //to make the imzge flipped
                                 .scaleEffect(x: -1)
                                 .transition(.identity)
                         }
@@ -76,8 +77,8 @@ struct OpenableBookView<Front: View, InsideLeft: View, InsideRight: View>:View, 
     }
     //configuration
     struct Config {
-        var width: CGFloat = 150
-        var height: CGFloat = 200
+        var width: CGFloat = 270
+        var height: CGFloat = 370
         var progress: CGFloat = 0
         var cornerRadius: CGFloat = 10
         var shadowColor: Color = .black
