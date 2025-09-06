@@ -61,7 +61,8 @@ struct CameraViewControllerWrapper: UIViewControllerRepresentable {
     }
 }
 
-class CameraViewController: UIViewController {
+class CameraViewController: UIViewController, ObservableObject{
+    @Published var frontFrame: CGImage?
     private var cameraView: CameraView { return view as! CameraView }
     
     private let videoDataOutputQueue = DispatchQueue(label: "CameraFeedDataOutput", qos: .userInteractive)
@@ -76,7 +77,8 @@ class CameraViewController: UIViewController {
     private var lastObservationTimestamp = Date()
     
     private var gestureProcessor = HandGestureProcessor()
-    
+    private var outputToCameraPosition: [AVCaptureOutput: AVCaptureDevice.Position] = [:]
+    private let context = CIContext()
     override func loadView() {
         self.view = CameraView()
     }
@@ -119,6 +121,9 @@ class CameraViewController: UIViewController {
         } catch {
             print("Camera error: \(error)")
         }
+        
+        let previewLayer = cameraView.previewLayer
+        previewLayer.connection!.videoOrientation = .landscapeRight
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -147,6 +152,7 @@ class CameraViewController: UIViewController {
         let dataOutput = AVCaptureVideoDataOutput()
         if session.canAddOutput(dataOutput) {
             session.addOutput(dataOutput)
+            outputToCameraPosition[dataOutput] = .front
             dataOutput.alwaysDiscardsLateVideoFrames = true
             dataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String:
                                         Int(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)]
@@ -241,10 +247,20 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
                        from connection: AVCaptureConnection) {
         var thumbTip: CGPoint?
         var indexTip: CGPoint?
-        
+        guard let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        let ciImage = CIImage(cvPixelBuffer: buffer)
+        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return }
         defer {
             DispatchQueue.main.sync {
                 self.processPoints(thumbTip: thumbTip, indexTip: indexTip)
+                if let position = self.outputToCameraPosition[output] {
+                    switch position {
+                    case .front:
+                        self.frontFrame = cgImage
+                    default:
+                        break
+                    }
+                }
             }
         }
 

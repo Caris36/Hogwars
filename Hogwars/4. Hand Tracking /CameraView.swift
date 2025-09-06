@@ -32,6 +32,11 @@ struct CameraPreview: UIViewRepresentable {
         let view = CameraView()
         view.previewLayer.session = session
         view.previewLayer.videoGravity = .resizeAspectFill
+        
+        if let connection = view.previewLayer.connection, connection.isVideoOrientationSupported {
+            
+                connection.videoOrientation = .landscapeRight
+            }
         return view
     }
 
@@ -41,49 +46,3 @@ struct CameraPreview: UIViewRepresentable {
 }
 
 // MARK: - SwiftUI Container View
-struct CameraContainerView: View {
-    @ObservedObject var model: CameraModel  // Your model with videoDeviceFrame
-    var session: AVCaptureSession
-
-    var body: some View {
-        ZStack {
-             // Live camera preview
-//            if model.isCameraReady {
-//                CameraPreview(session: session)
-//                    .frame(width: 170, height: 140)
-//                    .clipShape(RoundedRectangle(cornerRadius: 12))
-//                    .shadow(radius: 4)
-//                    rotationEffect(.degrees(180))
-//                    .scaleEffect(x: -1, y: 1)
-//                    .padding(.top, 15)
-//                    .padding(.bottom, 10)
-//            }
-            //  Fallback video snapshot
-            if model.isCameraReady {
-                CameraPreview(session: session)
-                if let videoDeviceFrame = model.videoDeviceFrame {
-                    Image(decorative: videoDeviceFrame as! CGImage, scale: 0.5, orientation: .up)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 170, height: 140, alignment: .topLeading)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(radius: 4)
-                        .rotationEffect(.degrees(180))
-                        .scaleEffect(x: -1, y: 1)
-                        .padding(.top, 15)
-                        .padding(.bottom, 10)
-                        .position(x: 85, y: 85)
-                }
-            }
-            //  Black placeholder
-            else {
-                Color.black
-                    .frame(width: 170, height: 140)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(radius: 4)
-                    .padding(.top, 15)
-                    .padding(.bottom, 10)
-            }
-        }
-    }
-}
