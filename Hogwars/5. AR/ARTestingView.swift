@@ -12,34 +12,39 @@ import ARKit
 struct ARTestingView: View {
     var body: some View {
         ARViewContainer().edgesIgnoringSafeArea(.all)
+        
     }
 }
-
 struct ARViewContainer: UIViewRepresentable {
     func makeUIView(context: Context) -> ARView {
         let arView = ARView(frame: .zero)
 
-        // Enable ARWorldTracking
         let config = ARWorldTrackingConfiguration()
         config.planeDetection = [.horizontal, .vertical]
         arView.session.run(config)
 
-        // Load the Earth model from USDZ
-        if let earthEntity = try? Entity.load(named: "Earth") {
-            // Scale Earth (default might be huge)
-            earthEntity.scale = SIMD3<Float>(0.1, 0.1, 0.1)
+        do {
+            let modelEntity = try ModelEntity.load(named: "Earth")
+            print("✅ Loaded Earth model")
+            modelEntity.scale = [0.1, 0.1, 0.1]
 
-            // Place it at origin
-            let anchor = AnchorEntity(world: [0, 0, -0.5]) // half a meter in front of camera
-            anchor.addChild(earthEntity)
-            arView.scene.addAnchor(anchor)
+            let anchorEntity = AnchorEntity(world: [0, 0, -0.5])
+            anchorEntity.addChild(modelEntity)
+            arView.scene.addAnchor(anchorEntity)
+
+            print("✅ Added Earth to AR scene")
+
+            // Optionally test fire
+            castIncendio(on: modelEntity)
+
+        } catch {
+            print("❌ Failed to load model: \(error)")
         }
 
         return arView
     }
 
     func updateUIView(_ uiView: ARView, context: Context) {}
-    
 }
 
 //NEED TO MAKE Fire.usdz entity
@@ -51,3 +56,4 @@ func castIncendio(on earth: Entity) {
         earth.addChild(fire)
     }
 }
+
