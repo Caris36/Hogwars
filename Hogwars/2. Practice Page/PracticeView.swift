@@ -50,8 +50,8 @@ struct PracticeView: View {
     func LeftView() -> some View {
         VStack {
             NavigationLink {
-                CustomARViewRepresentable()
-                    .ignoresSafeArea()
+             //   CustomARViewRepresentable()
+                //    .ignoresSafeArea()
             } label: {
                 Image(.page1)
                     .resizable()

@@ -12,7 +12,8 @@ struct DuelView: View {
         NavigationStack() {
             VStack {
                // CameraView() should be moved to another folder of Practice Page, linked by OpenableBookView
-                HandTrackerContentView()
+                
+                
             }
         }
     }

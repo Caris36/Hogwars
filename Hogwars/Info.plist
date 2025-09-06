@@ -4,5 +4,9 @@
 <dict>
 	<key>NSHandsTrackingUsageDescription</key>
 	<string>Hand tracking access is needed to explore the Hand tracking example code</string>
+	<key>Supported internal orientations (iPad)</key>
+	<array>
+		<string>Landscape (right home button)</string>
+	</array>
 </dict>
 </plist>

@@ -11,35 +11,22 @@ import RealityKit
 
 struct ContentView: View {
     var body: some View {
-        NavigationStack()  {
-            ZStack {
-                Image("Hogwars3")
-                    .resizable()
-                    .ignoresSafeArea()
-                    .scaledToFill()
-                VStack {
-                    NavigationLink {
-                        PracticeView()
-                    } label: {
-                        Image("Start1")
-                            .scaleEffect(0.5)
-                            .frame(width: 50, height: 50)
-                    }
-                }
-                VStack{
-                    NavigationLink {
-                        DuelView()
-                    } label: {
-                        Image("Duel3")
-                            .scaleEffect(0.5)
-                            .frame(width: 50, height: 50)
-                    } .offset(y: 75)
-                }
+        ZStack {
+            CameraViewControllerWrapper()
+             //CameraContainerView(model: CameraModel(), session: AVCaptureSession())
+            // CameraPreview(session: AVCaptureSession())
+            // CameraView()
+            
+            VStack {
+                Spacer()
+                Text("Hand Tracking Active")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.5))
+                    .cornerRadius(12)
+                    .padding()
             }
         }
+        .ignoresSafeArea()
     }
-}
-
-#Preview {
-    ContentView()
 }
