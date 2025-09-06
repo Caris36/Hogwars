@@ -4,7 +4,7 @@
 //
 //  Created by Eugene Tan on 23/8/25.
 //
-
+//
 import SwiftUI
 import RealityKit
 import ARKit
@@ -12,9 +12,9 @@ import ARKit
 struct ARTestingView: View {
     var body: some View {
         ARViewContainer().edgesIgnoringSafeArea(.all)
-        
     }
 }
+
 struct ARViewContainer: UIViewRepresentable {
     func makeUIView(context: Context) -> ARView {
         let arView = ARView(frame: .zero)
@@ -24,21 +24,31 @@ struct ARViewContainer: UIViewRepresentable {
         arView.session.run(config)
 
         do {
-            let modelEntity = try ModelEntity.load(named: "Earth")
-            print("✅ Loaded Earth model")
-            modelEntity.scale = [0.1, 0.1, 0.1]
+            let earth2 = try ModelEntity.load(named: "Earth2")
+            print("Loaded Earth model")
 
-            let anchorEntity = AnchorEntity(world: [0, 0, -0.5])
-            anchorEntity.addChild(modelEntity)
+            earth2.scale = [5, 5, 5]
+
+            let anchorEntity = AnchorEntity(plane: .horizontal, minimumBounds: [0.1, 0.1])
+            anchorEntity.addChild(earth2)
             arView.scene.addAnchor(anchorEntity)
 
-            print("✅ Added Earth to AR scene")
+            print("Added Earth to horizontal plane")
 
-            // Optionally test fire
-            castIncendio(on: modelEntity)
+            // Attach fire effect
+            if let fire = try? Entity.load(named: "Fire") {
+                fire.scale = [1, 1, 1]
+                fire.setPosition([0, 0, 0], relativeTo: earth2)
+                earth2.addChild(fire)
+                print("Fire added to Earth")
+            } else {
+                print("Could not load Fire.usdz")
+            }
+
+
 
         } catch {
-            print("❌ Failed to load model: \(error)")
+            print("Failed to load model: \(error)")
         }
 
         return arView
@@ -46,14 +56,3 @@ struct ARViewContainer: UIViewRepresentable {
 
     func updateUIView(_ uiView: ARView, context: Context) {}
 }
-
-//NEED TO MAKE Fire.usdz entity
-func castIncendio(on earth: Entity) {
-    // For iOS 16.6 we attach a fire model (usdz) instead of particles
-    if let fire = try? Entity.load(named: "Fire") { // make sure Fire.usdz is in project
-        fire.scale = [0.2, 0.2, 0.2]
-        fire.setPosition([0, 0, 0], relativeTo: earth) // attach to Earth center
-        earth.addChild(fire)
-    }
-}
-

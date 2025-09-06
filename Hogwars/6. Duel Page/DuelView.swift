@@ -11,7 +11,7 @@ struct DuelView: View {
     var body: some View {
         NavigationStack() {
             VStack {
-                Text("Work in progress")
+                ARViewContainer().edgesIgnoringSafeArea(.all)
                 
             }
         }
