@@ -57,7 +57,7 @@ struct PracticeView: View {
                                 .scaledToFill()
                         }
                 } label: {
-                    Image(.page1)
+                    Image("IncendioSpellPage")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 }
@@ -73,7 +73,7 @@ struct PracticeView: View {
                     progress = (progress == 1.0 ? 0.2 : 1.0)
                 }
             } label: {
-                Image(.page1)
+                Image("Spell2")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             }
