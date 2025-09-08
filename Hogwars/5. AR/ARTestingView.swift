@@ -23,7 +23,7 @@ struct ARViewContainer: UIViewRepresentable {
         let config = ARWorldTrackingConfiguration()
         config.planeDetection = [.horizontal, .vertical]
         arView.session.run(config)
-        let seconds = 8.0
+        let seconds = 5.0
         do {
             let earth2 = try ModelEntity.load(named: "Earth2")
             print("Loaded Earth model")
@@ -39,7 +39,7 @@ struct ARViewContainer: UIViewRepresentable {
             DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
                 // Attach fire effect
                 if let fire = try? Entity.load(named: "Fire") {
-                    fire.scale = [1.5, 1.5, 1.5]
+                    fire.scale = [1.0, 1.0, 1.0]
                     fire.setPosition([0, 0, 0], relativeTo: earth2)
                     earth2.addChild(fire)
                     print("Fire added to Earth")
