@@ -48,17 +48,22 @@ struct PracticeView: View {
     // Left View
     @ViewBuilder
     func LeftView() -> some View {
-        VStack {
-            NavigationLink {
-                CameraViewControllerWrapper()
-            } label: {
-                Image(.page1)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
+            VStack {
+                NavigationLink {
+                    CameraViewControllerWrapper()
+                        .overlay {
+                            Image("IncendioSpell")
+                                .resizable()
+                                .scaledToFill()
+                        }
+                } label: {
+                    Image(.page1)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+
             }
-            
         }
-    }
     //Right view
     @ViewBuilder
     func RightView() -> some View {
