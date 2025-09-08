@@ -10,6 +10,7 @@ import RealityKit
 import ARKit
 
 struct ARTestingView: View {
+
     var body: some View {
         ARViewContainer().edgesIgnoringSafeArea(.all)
     }
@@ -22,7 +23,7 @@ struct ARViewContainer: UIViewRepresentable {
         let config = ARWorldTrackingConfiguration()
         config.planeDetection = [.horizontal, .vertical]
         arView.session.run(config)
-
+        let seconds = 8.0
         do {
             let earth2 = try ModelEntity.load(named: "Earth2")
             print("Loaded Earth model")
@@ -35,21 +36,25 @@ struct ARViewContainer: UIViewRepresentable {
 
             print("Added Earth to horizontal plane")
 
-            // Attach fire effect
-            if let fire = try? Entity.load(named: "Fire") {
-                fire.scale = [1, 1, 1]
-                fire.setPosition([0, 0, 0], relativeTo: earth2)
-                earth2.addChild(fire)
-                print("Fire added to Earth")
-            } else {
-                print("Could not load Fire.usdz")
+            DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+                // Attach fire effect
+                if let fire = try? Entity.load(named: "Fire") {
+                    fire.scale = [1.5, 1.5, 1.5]
+                    fire.setPosition([0, 0, 0], relativeTo: earth2)
+                    earth2.addChild(fire)
+                    print("Fire added to Earth")
+                } else {
+                    print("Could not load Fire.usdz")
+                }
             }
-
-
+         
+        
 
         } catch {
             print("Failed to load model: \(error)")
         }
+        
+        
 
         return arView
     }

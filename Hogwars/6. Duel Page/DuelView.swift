@@ -10,9 +10,8 @@ import SwiftUI
 struct DuelView: View {
     var body: some View {
         NavigationStack() {
-            VStack {
+            ZStack {
                 ARViewContainer().edgesIgnoringSafeArea(.all)
-                
             }
         }
     }
