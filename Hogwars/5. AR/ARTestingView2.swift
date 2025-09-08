@@ -16,6 +16,7 @@ struct ARTestingView2: View {
 
     @State private var assistant: Entity? = nil
     @State private var projectile: Entity? = nil
+    let seconds = 4.0
 
     var body: some View {
         ARViewContainer()
@@ -24,7 +25,7 @@ struct ARTestingView2: View {
 struct ARViewContainer: UIViewRepresentable {
     func makeUIView(context: Context) -> ARView {
         let arView = ARView(frame: .zero)
-
+        let seconds = 4.0
         // Enable plane detection
         let config = ARWorldTrackingConfiguration()
         config.planeDetection = [.horizontal]
@@ -43,17 +44,21 @@ struct ARViewContainer: UIViewRepresentable {
                 print("Added Earth to scene")
 
                 // Delay before particle animation
-                try await Task.sleep(for: .seconds(1))
+                //try await Task.sleep(for: .seconds(1))
 
                 // Load particle projectile
-                let projectileSceneEntity = try await Entity(named: "MainParticle", in: Bundle.main)
-
-                guard let projectile = projectileSceneEntity.findEntity(named: "ParticleRoot") else {
+                let projectileSceneEntity = try await Entity(named: "Fire")
+                projectileSceneEntity.scale = [1, 1, 1]
+                
+                let particleEntity = AnchorEntity(plane: .horizontal, minimumBounds: [0.1, 0.1])
+                particleEntity.addChild(projectileSceneEntity)
+                arView.scene.addAnchor(particleEntity)
+               
+                guard let projectile = projectileSceneEntity.findEntity(named: "Fire") else {
                     print("Could not find ParticleRoot")
                     return
                 }
-
-                projectile.scale = [1.0, 1.0, 1.0]
+               
                 arView.scene.anchors.append(AnchorEntity(world: [0, 0, 0])) // Temporary root
 
                 // Place projectile at camera position
@@ -62,6 +67,9 @@ struct ARViewContainer: UIViewRepresentable {
                                                       cameraTransform.columns.3.y,
                                                       cameraTransform.columns.3.z)
                     projectile.position = cameraPosition
+                } else {
+                    print("placed projectile at camera position")
+                    return
                 }
 
                 let projectileAnchor = AnchorEntity(world: projectile.position)
@@ -80,7 +88,7 @@ struct ARViewContainer: UIViewRepresentable {
                                 timingFunction: .easeInOut)
 
                 // Stop emission after arrival
-                try await Task.sleep(for: .seconds(1))
+                try await Task.sleep(for: .seconds(3))
                 projectile.children.first?.components[ParticleEmitterComponent.self]?.isEmitting = false
 
                 // Attach to Earth after arrival
@@ -88,6 +96,18 @@ struct ARViewContainer: UIViewRepresentable {
                 projectile.position = .zero // Attach to center of Earth
 
                 print("Particle reached Earth and attached")
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+                    // Attach fire effect
+                    if let fireEntity = try? Entity.load(named: "Fire") {
+                        fireEntity.scale = [1.0, 1.0, 1.0]
+                        fireEntity.setPosition([0, 0, 0], relativeTo: earthEntity)
+                        earthEntity.addChild(fireEntity)
+                        print("Fire added to Earth")
+                    } else {
+                        print("Could not load Fire.usdz")
+                    }
+                }
 
             } catch {
                 print("Error loading models: \(error)")
