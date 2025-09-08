@@ -11,7 +11,7 @@ struct DuelView: View {
     var body: some View {
         NavigationStack() {
             ZStack {
-                ARViewContainer().edgesIgnoringSafeArea(.all)
+                ARTestingView2().edgesIgnoringSafeArea(.all)
             }
         }
     }
