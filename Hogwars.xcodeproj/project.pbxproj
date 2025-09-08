@@ -15,7 +15,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Packages/RealityKitContent,
 			);
 			target = 6B4085202E2B39580079127C /* Hogwars */;
 		};
