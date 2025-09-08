@@ -50,12 +50,8 @@ struct PracticeView: View {
     func LeftView() -> some View {
             VStack {
                 NavigationLink {
-                    CameraViewControllerWrapper()
-                        .overlay {
-                            Image("IncendioSpell")
-                                .resizable()
-                                .scaledToFill()
-                        }
+                    CameraView2()
+                        
                 } label: {
                     Image("IncendioSpellPage")
                         .resizable()
