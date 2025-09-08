@@ -48,7 +48,7 @@ struct ARViewContainer: UIViewRepresentable {
 
                 // Load particle projectile
                 let projectileSceneEntity = try await Entity(named: "Fire")
-                projectileSceneEntity.scale = [0.7, 0.7, 0.7]
+                projectileSceneEntity.scale = [0.1, 0.1, 0.1]
                 
                 let particleEntity = AnchorEntity(plane: .horizontal, minimumBounds: [0.1, 0.1])
                 particleEntity.addChild(projectileSceneEntity)
@@ -84,7 +84,7 @@ struct ARViewContainer: UIViewRepresentable {
                 let destination = earthEntity.position(relativeTo: nil)
                 projectile.move(to: Transform(translation: destination),
                                 relativeTo: nil,
-                                duration: 5.0,
+                                duration: 4.0,
                                 timingFunction: .easeInOut)
 
                 // Stop emission after arrival
